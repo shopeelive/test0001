@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Firebase Authentication</title>
 </head>
+
 <body>
     <h1>Firebase Authentication</h1>
     <button id="login">Google Sign In</button>
@@ -16,22 +18,20 @@
     <script>
         // Paste your Firebase config object here
         var firebaseConfig = {
-    apiKey: "AIzaSyB2_2WWRNMyojBKFfRL2RXiir3rgZVCRhA",
-    authDomain: "fidel-f8814.firebaseapp.com",
-    projectId: "fidel-f8814",
-	databaseURL: "https://fidel-f8814-default-rtdb.asia-southeast1.firebasedatabase.app/",
-    storageBucket: "fidel-f8814.appspot.com",
-    messagingSenderId: "709483654742",
-    appId: "1:709483654742:web:a05299c807bfed6e1815f7"
-};
+            apiKey: "AIzaSyB2_2WWRNMyojBKFfRL2RXiir3rgZVCRhA",
+            authDomain: "fidel-f8814.firebaseapp.com",
+            projectId: "fidel-f8814",
+            databaseURL: "https://fidel-f8814-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            storageBucket: "fidel-f8814.appspot.com",
+            messagingSenderId: "709483654742",
+            appId: "1:709483654742:web:a05299c807bfed6e1815f7"
+        };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         firebase.analytics();
 
         const auth = firebase.auth();
 
-        // Google Sign In
         const loginButton = document.getElementById('login');
         loginButton.addEventListener('click', async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -40,9 +40,16 @@
                 const user = result.user;
                 console.log(user);
             } catch (error) {
-                console.error(error.message);
+                if (error.code === 'auth/popup-closed-by-user') {
+                    console.warn('User closed the sign-in popup. Sign-in process canceled.');
+                    // Display a message to the user on your page
+                    alert('Sign-in process canceled. Please try again.');
+                } else {
+                    console.error(error.message);
+                }
             }
         });
     </script>
 </body>
+
 </html>
