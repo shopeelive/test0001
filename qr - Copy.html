@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to Word</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.1.0/html-docx.min.js"></script>
+</head>
+<body>
+    <h1>Your HTML Content</h1>
+    <p>This is a sample paragraph.</p>
+    <button id="download">Download as Word</button>
+
+    <script>
+        document.getElementById('download').addEventListener('click', function() {
+            const html = document.documentElement.innerHTML; // Get entire HTML
+            const converted = htmlDocx.asBlob(html);
+            const url = URL.createObjectURL(converted);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.docx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+    </script>
+</body>
+</html>
