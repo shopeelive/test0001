@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch All Enrollee Data from Firebase</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+    <h1>Enrollee Data</h1>
+    <ul id="enrolleeList"></ul>
+    <button id="generate-pdf">Generate PDF</button>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyABbM21Aiy_UO86ZLomukM9LLUwRoPCzdg",
+            authDomain: "brgyhall-84c3e.firebaseapp.com",
+            databaseURL: "https://brgyhall-84c3e.firebaseio.com",
+            projectId: "brgyhall-84c3e",
+            storageBucket: "brgyhall-84c3e.appspot.com",
+            messagingSenderId: "703522383994",
+            appId: "1:703522383994:web:2e008786c1d13c8fd5b3c3"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const enrolleeList = document.getElementById('enrolleeList');
+
+        function fetchEnrollees() {
+            database.ref('management/enrollees').on('value', (snapshot) => {
+                enrolleeList.innerHTML = ''; // Clear existing list
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const enrollee = childSnapshot.val();
+                        const li = document.createElement('li');
+                        li.textContent = `Name: ${enrollee.aFname} ${enrollee.aMname} ${enrollee.aLname}, Course: ${enrollee.aCourse}, Student ID: ${enrollee.aStud_ID}, Year: ${enrollee.aYear}, Date: ${enrollee.todate}`;
+                        enrolleeList.appendChild(li);
+                    });
+                } else {
+                    enrolleeList.innerHTML = "No data available.";
+                }
+            });
+        }
+
+        document.getElementById('generate-pdf').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Add title to the PDF
+            doc.setFontSize(22);
+            doc.text("Enrollee Data", 10, 10);
+            doc.setFontSize(12);
+
+            // Fetch enrollee data for PDF
+            database.ref('management/enrollees').once('value', (snapshot) => {
+                let y = 20; // Initial y position for text
+
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const enrollee = childSnapshot.val();
+                        doc.text(`Name: ${enrollee.aFname} ${enrollee.aMname} ${enrollee.aLname}, Course: ${enrollee.aCourse}, Student ID: ${enrollee.aStud_ID}, Year: ${enrollee.aYear}, Date: ${enrollee.todate}`, 10, y);
+                        y += 10; // Move y position down for each enrollee
+                    });
+                } else {
+                    doc.text("No data available.", 10, y);
+                }
+
+                // Save the PDF
+                doc.save("enrollee_data.pdf");
+            });
+        });
+
+        // Call the function to fetch enrollees on page load
+        fetchEnrollees();
+    </script>
+</body>
+</html>
